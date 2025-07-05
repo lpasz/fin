@@ -63,7 +63,11 @@ defmodule Fin.MixProject do
       {:oauth2, "~> 2.0"},
       {:ueberauth_hubspot, "~> 0.1.0"},
       {:pgvector, "~> 0.3"},
-      {:timex, "~> 3.7"}
+      {:timex, "~> 3.7"},
+      {:oban, "~> 2.19"},
+      {:oban_web, "~> 2.11"},
+      {:igniter, "~> 0.5", only: [:dev]},
+      {:earmark, "~> 1.4"}
     ]
   end
 

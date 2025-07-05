@@ -11,6 +11,11 @@ config :fin,
   ecto_repos: [Fin.Repo],
   generators: [timestamp_type: :utc_datetime, binary_id: true]
 
+# In config/config.exs
+config :fin, Oban,
+  repo: Fin.Repo,
+  queues: [job: 20]
+
 config :fin, Fin.Repo, types: Fin.PostgrexTypes
 
 # Configures the endpoint
@@ -65,8 +70,18 @@ config :phoenix, :json_library, Jason
 
 config :ueberauth, Ueberauth,
   providers: [
-    google: {Ueberauth.Strategy.Google, [default_scope: "https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.compose https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/userinfo.email"]},
-    hubspot: {Ueberauth.Strategy.Hubspot, [scope: "crm.objects.contacts.read crm.objects.contacts.write crm.schemas.contacts.read crm.schemas.contacts.write"]}
+    google:
+      {Ueberauth.Strategy.Google,
+       [
+         default_scope:
+           "https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.compose https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/userinfo.email"
+       ]},
+    hubspot:
+      {Ueberauth.Strategy.Hubspot,
+       [
+         scope:
+           "crm.objects.contacts.read crm.objects.contacts.write crm.schemas.contacts.read crm.schemas.contacts.write"
+       ]}
   ]
 
 # Import environment specific config. This must remain at the bottom

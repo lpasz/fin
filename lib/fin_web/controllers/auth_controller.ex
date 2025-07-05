@@ -16,7 +16,9 @@ defmodule FinWeb.AuthController do
     IO.inspect(auth.credentials.token, label: "Auth Token from Ueberauth")
     case find_or_create_user(auth) do
       {:ok, user} ->
-        Fin.User.fetch_and_store_emails(user)
+        # Enqueue background Gmail import job
+        Oban.insert!(Fin.GmailImportWorker.new(%{"user_id" => user.id}))
+
         conn
         |> put_session(:user_id, user.id)
         |> put_flash(:info, "Logged in successfully.")

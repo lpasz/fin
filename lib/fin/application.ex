@@ -11,6 +11,7 @@ defmodule Fin.Application do
       FinWeb.Telemetry,
       Fin.Repo,
       {DNSCluster, query: Application.get_env(:fin, :dns_cluster_query) || :ignore},
+      {Oban, Application.fetch_env!(:fin, Oban)},
       {Phoenix.PubSub, name: Fin.PubSub},
       # Start the Finch HTTP client for sending emails
       {Finch, name: Fin.Finch},
