@@ -1,6 +1,8 @@
 defmodule FinWeb.Router do
   use FinWeb, :router
 
+  import Oban.Web.Router
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -40,6 +42,12 @@ defmodule FinWeb.Router do
 
       live_dashboard "/dashboard", metrics: FinWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
+    end
+
+    scope "/" do
+      pipe_through :browser
+
+      oban_dashboard("/oban")
     end
   end
 
