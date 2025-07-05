@@ -35,14 +35,14 @@ defmodule FinWeb.AuthController do
   defp find_or_create_user(auth) do
     user_params = %{
       email: auth.info.email,
-      provider: auth.provider,
+      provider: to_string(auth.provider),
       token: auth.credentials.token,
       refresh_token: auth.credentials.refresh_token,
       expires_at: auth.credentials.expires_at,
       uid: auth.uid
     }
 
-    case Repo.get_by(User, uid: auth.uid, provider: auth.provider) do
+    case Repo.get_by(User, uid: auth.uid, provider: to_string(auth.provider)) do
       nil ->
         %User{}
         |> User.changeset(user_params)
