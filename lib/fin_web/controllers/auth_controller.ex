@@ -1,7 +1,9 @@
-
 defmodule FinWeb.AuthController do
   use FinWeb, :controller
   plug Ueberauth
+
+  alias Fin.User
+  alias Fin.Repo
 
   def callback(%{assigns: %{ueberauth_failure: _fails}} = conn, _params) do
     conn
@@ -10,10 +12,17 @@ defmodule FinWeb.AuthController do
   end
 
   def callback(%{assigns: %{ueberauth_auth: auth}} = conn, _params) do
-    IO.inspect(auth) # For now, just inspect the auth data
-    conn
-    |> put_flash(:info, "Logged in successfully.")
-    |> redirect(to: "/")
+    case find_or_create_user(auth) do
+      {:ok, user} ->
+        conn
+        |> put_session(:user_id, user.id)
+        |> put_flash(:info, "Logged in successfully.")
+        |> redirect(to: "/")
+      {:error, _reason} ->
+        conn
+        |> put_flash(:error, "Failed to save user.")
+        |> redirect(to: "/")
+    end
   end
 
   def delete(conn, _params) do
@@ -21,5 +30,27 @@ defmodule FinWeb.AuthController do
     |> clear_session()
     |> put_flash(:info, "Logged out successfully.")
     |> redirect(to: "/")
+  end
+
+  defp find_or_create_user(auth) do
+    user_params = %{
+      email: auth.info.email,
+      provider: auth.provider,
+      token: auth.credentials.token,
+      refresh_token: auth.credentials.refresh_token,
+      expires_at: auth.credentials.expires_at,
+      uid: auth.uid
+    }
+
+    case Repo.get_by(User, uid: auth.uid, provider: auth.provider) do
+      nil ->
+        %User{}
+        |> User.changeset(user_params)
+        |> Repo.insert()
+      user ->
+        user
+        |> User.changeset(user_params)
+        |> Repo.update()
+    end
   end
 end

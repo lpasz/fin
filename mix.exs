@@ -61,7 +61,8 @@ defmodule Fin.MixProject do
       {:ueberauth, "~> 0.10"},
       {:ueberauth_google, "~> 0.10"},
       {:oauth2, "~> 2.0"},
-      {:ueberauth_hubspot, "~> 0.1.0"}
+      {:ueberauth_hubspot, "~> 0.1.0"},
+      {:pgvector, "~> 0.3"}
     ]
   end
 
