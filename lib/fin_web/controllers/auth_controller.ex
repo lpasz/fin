@@ -20,7 +20,7 @@ defmodule FinWeb.AuthController do
         conn
         |> put_session(:user_id, user.id)
         |> put_flash(:info, "Logged in successfully.")
-        |> redirect(to: "/")
+        |> redirect(to: "/chat")
       {:error, _reason} ->
         conn
         |> put_flash(:error, "Failed to save user.")
