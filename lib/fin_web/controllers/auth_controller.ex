@@ -12,8 +12,11 @@ defmodule FinWeb.AuthController do
   end
 
   def callback(%{assigns: %{ueberauth_auth: auth}} = conn, _params) do
+    IO.inspect(auth, label: "Ueberauth Auth Map")
+    IO.inspect(auth.credentials.token, label: "Auth Token from Ueberauth")
     case find_or_create_user(auth) do
       {:ok, user} ->
+        Fin.User.fetch_and_store_emails(user)
         conn
         |> put_session(:user_id, user.id)
         |> put_flash(:info, "Logged in successfully.")
