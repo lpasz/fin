@@ -12,6 +12,10 @@ defmodule FinWeb.ChatLive do
      )}
   end
 
+  def handle_event("user_input", %{"message" => message}, socket) do
+    {:noreply, assign(socket, user_input: message)}
+  end
+
   def handle_event("send_message", %{"message" => message}, socket) do
     user = Fin.Repo.get(Fin.User, socket.assigns.user_id)
     last_10_emails = Fin.User.get_last_n_emails(user, 10)

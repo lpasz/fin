@@ -15,7 +15,8 @@
       value={@user_input}
       class="flex-1 p-2 border rounded"
       placeholder="Type a message..."
+      phx-change="user_input"
     />
-    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Send</button>
+    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded" phx-disable-with="Sending...">Send</button>
   </form>
 </div>
