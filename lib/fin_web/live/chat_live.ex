@@ -1,11 +1,7 @@
 defmodule FinWeb.ChatLive do
   use FinWeb, :live_view
-  import Phoenix.HTML.Form
-  import Phoenix.LiveView.Helpers
 
-  alias Fin.User
-  alias Fin.Repo
-  alias Fin.LLM
+  alias FinWeb.ChatMessageComponent
 
   def mount(_params, %{"user_id" => user_id} = _session, socket) do
     {:ok,
@@ -33,16 +29,19 @@ defmodule FinWeb.ChatLive do
   end
 
   defp generate_response(user_question, emails) do
-    email_contents = Enum.map(emails, fn email ->
-      "Subject: #{email.subject}\nBody: #{email.body}"
-    end)
-    |> Enum.join("\n\n")
+    email_contents =
+      Enum.map(emails, fn email ->
+        "Subject: #{email.subject}\nBody: #{email.body}"
+      end)
+      |> Enum.join("\n\n")
 
-    full_prompt = "You are an AI assistant that answers questions about emails.\n\nUser question: #{user_question}\n\nEmails:\n#{email_contents}"
+    full_prompt =
+      "You are an AI assistant that answers questions about emails.\n\nUser question: #{user_question}\n\nEmails:\n#{email_contents}"
 
     case Fin.LLM.generate_content(full_prompt) do
       {:ok, response_text} ->
         response_text
+
       {:error, reason} ->
         "Error generating response: #{inspect(reason)}"
     end

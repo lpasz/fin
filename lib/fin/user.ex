@@ -1,8 +1,6 @@
 defmodule Fin.User do
   use Ecto.Schema
-
   import Ecto.Changeset
-  import Ecto.Query
 
   alias Fin.Repo
   alias Fin.Gmail
@@ -15,6 +13,8 @@ defmodule Fin.User do
     field :refresh_token, :string
     field :expires_at, :integer
     field :uid, :string
+
+    has_many :emails, Email
 
     timestamps()
   end
@@ -32,15 +32,19 @@ defmodule Fin.User do
         Enum.each(messages, fn %{"id" => message_id} ->
           case Gmail.get_message(user.token, message_id) do
             {:ok, message_data} ->
+              IO.inspect(message_data, label: "Raw message_data from Gmail")
               # Parse message_data and save to database
               # This is a simplified parsing, you might need more robust parsing for different email formats
               payload = message_data["payload"]
+              IO.inspect(payload, label: "Extracted payload")
               headers = payload["headers"]
+              IO.inspect(headers, label: "Extracted headers")
               body = get_email_body(payload)
+              IO.inspect(body, label: "Extracted body")
 
-              sender = List.keyfind(headers, "From", 0)["value"]
-              recipient = List.keyfind(headers, "To", 0)["value"]
-              subject = List.keyfind(headers, "Subject", 0)["value"]
+              sender = Enum.find(headers, fn h -> h["name"] == "From" end)["value"]
+              recipient = Enum.find(headers, fn h -> h["name"] == "To" end)["value"]
+              subject = Enum.find(headers, fn h -> h["name"] == "Subject" end)["value"]
               sent_at = List.keyfind(headers, "Date", 0)["value"] |> parse_email_date()
 
               email_params = %{
@@ -53,10 +57,14 @@ defmodule Fin.User do
                 sent_at: sent_at,
                 user_id: user.id
               }
+              IO.inspect(email_params, label: "Email params before changeset")
 
-              %Email{}
-              |> Email.changeset(email_params)
-              |> Repo.insert()
+              case Repo.insert(%Email{} |> Email.changeset(email_params)) do
+                {:ok, email} ->
+                  IO.inspect(email, label: "Successfully inserted email")
+                {:error, changeset} ->
+                  IO.inspect(changeset.errors, label: "Error inserting email")
+              end
 
             {:error, reason} ->
               IO.inspect(reason, label: "Error fetching message #{message_id}")
@@ -102,6 +110,7 @@ defmodule Fin.User do
   end
 
   def get_last_n_emails(user, _n) do
-    Repo.preload(user, :emails)
+    user = Repo.preload(user, :emails)
+    user.emails
   end
 end
