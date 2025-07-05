@@ -1,6 +1,8 @@
 defmodule Fin.User do
   use Ecto.Schema
+
   import Ecto.Changeset
+  import Ecto.Query
 
   alias Fin.Repo
   alias Fin.Gmail
@@ -60,6 +62,7 @@ defmodule Fin.User do
               IO.inspect(reason, label: "Error fetching message #{message_id}")
           end
         end)
+
       {:error, reason} ->
         IO.inspect(reason, label: "Error listing messages")
     end
@@ -68,8 +71,9 @@ defmodule Fin.User do
   defp get_email_body(payload) do
     if payload["parts"] do
       # Prioritize text/plain or text/html
-      part = Enum.find(payload["parts"], fn p -> p["mimeType"] == "text/plain" end) ||
-             Enum.find(payload["parts"], fn p -> p["mimeType"] == "text/html" end)
+      part =
+        Enum.find(payload["parts"], fn p -> p["mimeType"] == "text/plain" end) ||
+          Enum.find(payload["parts"], fn p -> p["mimeType"] == "text/html" end)
 
       if part && part["body"] && part["body"]["data"] do
         part["body"]["data"]
@@ -92,7 +96,12 @@ defmodule Fin.User do
     # Consider using a more robust library like `Timex` for production.
     case Timex.parse(date_string, "{RFC1123}") do
       {:ok, datetime} -> datetime
-      _ -> DateTime.utc_now() # Fallback
+      # Fallback
+      _ -> DateTime.utc_now()
     end
+  end
+
+  def get_last_n_emails(user, _n) do
+    Repo.preload(user, :emails)
   end
 end
