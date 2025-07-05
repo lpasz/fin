@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for fin on 2025-07-05T10:43:21-03:00
+# fly.toml app configuration file generated for fin-misty-shape-5207 on 2025-07-05T10:49:52-03:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'fin'
+app = 'fin-misty-shape-5207'
 primary_region = 'gru'
 kill_signal = 'SIGTERM'
 
@@ -13,7 +13,7 @@ kill_signal = 'SIGTERM'
   release_command = '/app/bin/migrate'
 
 [env]
-  PHX_HOST = 'fin.fly.dev'
+  PHX_HOST = 'fin-misty-shape-5207.fly.dev'
   PORT = '8080'
 
 [http_service]
