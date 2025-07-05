@@ -14,7 +14,7 @@ config :fin,
 # In config/config.exs
 config :fin, Oban,
   repo: Fin.Repo,
-  queues: [job: 20]
+  queues: [default: 20]
 
 config :fin, Fin.Repo, types: Fin.PostgrexTypes
 

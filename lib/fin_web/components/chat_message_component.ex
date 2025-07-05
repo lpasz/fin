@@ -16,9 +16,9 @@ defmodule FinWeb.ChatMessageComponent do
         end
       }>
         <%= if @message.role == :bot do %>
-          <%= raw(Earmark.as_html!(@message.content)) %>
+          {raw(Earmark.as_html!(@message.content))}
         <% else %>
-          <%= @message.content %>
+          {@message.content}
         <% end %>
       </div>
     </div>

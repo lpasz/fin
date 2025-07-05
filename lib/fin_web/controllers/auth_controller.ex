@@ -1,5 +1,6 @@
 defmodule FinWeb.AuthController do
   use FinWeb, :controller
+
   plug Ueberauth
 
   alias Fin.User
@@ -12,17 +13,17 @@ defmodule FinWeb.AuthController do
   end
 
   def callback(%{assigns: %{ueberauth_auth: auth}} = conn, _params) do
-    IO.inspect(auth, label: "Ueberauth Auth Map")
-    IO.inspect(auth.credentials.token, label: "Auth Token from Ueberauth")
     case find_or_create_user(auth) do
       {:ok, user} ->
-        # Enqueue background Gmail import job
-        Oban.insert!(Fin.GmailImportWorker.new(%{"user_id" => user.id}))
+          %{"user_id" => user.id}
+          |> Fin.GmailImportList.new()
+          |> Oban.insert!()
 
         conn
         |> put_session(:user_id, user.id)
         |> put_flash(:info, "Logged in successfully.")
         |> redirect(to: "/chat")
+
       {:error, _reason} ->
         conn
         |> put_flash(:error, "Failed to save user.")
@@ -52,6 +53,7 @@ defmodule FinWeb.AuthController do
         %User{}
         |> User.changeset(user_params)
         |> Repo.insert()
+
       user ->
         user
         |> User.changeset(user_params)

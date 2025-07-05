@@ -57,11 +57,13 @@ defmodule Fin.User do
                 sent_at: sent_at,
                 user_id: user.id
               }
+
               IO.inspect(email_params, label: "Email params before changeset")
 
               case Repo.insert(%Email{} |> Email.changeset(email_params)) do
                 {:ok, email} ->
                   IO.inspect(email, label: "Successfully inserted email")
+
                 {:error, changeset} ->
                   IO.inspect(changeset.errors, label: "Error inserting email")
               end

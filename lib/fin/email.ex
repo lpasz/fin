@@ -20,8 +20,27 @@ defmodule Fin.Email do
 
   def changeset(email, attrs) do
     email
-    |> cast(attrs, [:message_id, :thread_id, :sender, :recipient, :subject, :body, :sent_at, :received_at, :user_id])
-    |> validate_required([:message_id, :thread_id, :sender, :recipient, :subject, :body, :sent_at, :user_id])
+    |> cast(attrs, [
+      :message_id,
+      :thread_id,
+      :sender,
+      :recipient,
+      :subject,
+      :body,
+      :sent_at,
+      :received_at,
+      :user_id
+    ])
+    |> validate_required([
+      :message_id,
+      :thread_id,
+      :sender,
+      :recipient,
+      :subject,
+      :body,
+      :sent_at,
+      :user_id
+    ])
     |> unique_constraint(:message_id)
   end
 end
