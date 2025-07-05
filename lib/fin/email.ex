@@ -11,6 +11,7 @@ defmodule Fin.Email do
     field :body, :string
     field :sent_at, :utc_datetime
     field :received_at, :utc_datetime, default: DateTime.truncate(DateTime.utc_now(), :second)
+    field :embedding, Pgvector.Ecto.Vector
 
     belongs_to :user, Fin.User
 

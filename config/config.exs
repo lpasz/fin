@@ -11,6 +11,8 @@ config :fin,
   ecto_repos: [Fin.Repo],
   generators: [timestamp_type: :utc_datetime, binary_id: true]
 
+config :fin, Fin.Repo, types: Fin.PostgrexTypes
+
 # Configures the endpoint
 config :fin, FinWeb.Endpoint,
   url: [host: "localhost"],
