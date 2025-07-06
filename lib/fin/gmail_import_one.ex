@@ -24,7 +24,7 @@ defmodule Fin.GmailImportOne do
            sent_at: sent_at,
            user_id: user_id
          },
-         {:ok, email} <- Repo.insert(Email.changeset(%Email{}, email_params), on_conflict: :replace_all),
+         {:ok, email} <- Repo.insert(Email.changeset(%Email{}, email_params), on_conflict: :nothing, returning: true),
          {:ok, embedding} <- LLM.generate_embedding("#{subject} #{body}"),
          {:ok, email} <- Email.changeset(email, %{embedding: embedding}) |> Repo.update() do
       {:ok, email}
