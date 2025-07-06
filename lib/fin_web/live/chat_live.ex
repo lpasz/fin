@@ -17,11 +17,11 @@ defmodule FinWeb.ChatLive do
   end
 
   def handle_event("send_message", %{"message" => message}, socket) do
-    user = Fin.Repo.get(Fin.User, socket.assigns.user_id)
-    last_10_emails = Fin.User.get_last_n_emails(user, 10)
+    user_id = socket.assigns.user_id
+    similar_emails = Fin.Email.find_similar_emails(user_id, message)
 
     user_message = %{role: :user, content: message}
-    bot_response = %{role: :bot, content: generate_response(message, last_10_emails)}
+    bot_response = %{role: :bot, content: generate_response(message, similar_emails)}
 
     messages = socket.assigns.messages ++ [user_message, bot_response]
 

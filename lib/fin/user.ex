@@ -110,9 +110,4 @@ defmodule Fin.User do
       _ -> DateTime.utc_now()
     end
   end
-
-  def get_last_n_emails(user, _n) do
-    user = Repo.preload(user, :emails)
-    user.emails
-  end
 end
