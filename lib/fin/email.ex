@@ -110,7 +110,7 @@ defmodule Fin.Email do
   """
   def generate_embedding(email) do
     # Combine subject and body for embedding
-    text_content = "#{email.subject} #{email.body}"
+    text_content = "#{email.subject} #{email.body}" |> String.slice(0, 15_000)
     
     case Fin.LLM.generate_embedding(text_content) do
       {:ok, embedding_values} ->

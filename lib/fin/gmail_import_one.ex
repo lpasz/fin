@@ -9,25 +9,32 @@ defmodule Fin.GmailImportOne do
     with {:ok, message_data} <- Fin.Gmail.get_message(access_token, message_id),
          payload = message_data["payload"],
          headers = payload["headers"],
-         body = get_email_body(payload),
+         body = get_email_body(payload) |> String.slice(0, 15_000),
          sender = Enum.find(headers, fn h -> h["name"] == "From" end)["value"],
          recipient = Enum.find(headers, fn h -> h["name"] == "To" end)["value"],
          subject = Enum.find(headers, fn h -> h["name"] == "Subject" end)["value"],
          sent_at = List.keyfind(headers, "Date", 0)["value"] |> parse_email_date(),
-         email_params = %{
-           message_id: message_data["id"],
-           thread_id: message_data["threadId"],
-           sender: sender,
-           recipient: recipient,
-           subject: subject,
-           body: body,
-           sent_at: sent_at,
-           user_id: user_id
-         },
-         {:ok, email} <- Repo.insert(Email.changeset(%Email{}, email_params), on_conflict: :nothing, returning: true),
-         {:ok, embedding} <- LLM.generate_embedding("#{subject} #{body}"),
-         {:ok, email} <- Email.changeset(email, %{embedding: embedding}) |> Repo.update() do
-      {:ok, email}
+         {:ok, embedding_values} <- LLM.generate_embedding("#{subject} #{body}") do
+      email_params = %{
+        message_id: message_data["id"],
+        thread_id: message_data["threadId"],
+        sender: sender,
+        recipient: recipient,
+        subject: subject,
+        body: body,
+        sent_at: sent_at,
+        user_id: user_id,
+        embedding: Pgvector.new(embedding_values)
+      }
+
+      changeset = Email.changeset_with_embedding(%Email{}, email_params)
+
+      Repo.insert(
+        changeset,
+        on_conflict: [set: [embedding: email_params.embedding, updated_at: NaiveDateTime.utc_now()]],
+        conflict_target: :message_id,
+        returning: true
+      )
     end
   end
 
