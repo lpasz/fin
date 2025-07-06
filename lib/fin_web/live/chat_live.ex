@@ -24,7 +24,7 @@ defmodule FinWeb.ChatLive do
 
   def handle_event("send_message", %{"message" => message}, socket) do
     user_id = socket.assigns.user_id
-    
+
     # Use semantic search to find relevant emails
     relevant_emails = Fin.Email.find_similar_emails(user_id, message)
 
@@ -44,8 +44,7 @@ defmodule FinWeb.ChatLive do
     # Update email count and schedule next update
     Process.send_after(self(), :update_email_count, 1000)
 
-    {:noreply,
-     assign(socket, email_count: get_email_count(socket.assigns.user_id))}
+    {:noreply, assign(socket, email_count: get_email_count(socket.assigns.user_id))}
   end
 
   defp get_email_count(user_id) do

@@ -11,8 +11,11 @@ defmodule FinWeb.ChatMessageComponent do
     }>
       <div class={
         case @message.role do
-          :user -> "max-w-xs lg:max-w-md bg-blue-600 text-white px-4 py-3 rounded-2xl rounded-br-md shadow-sm"
-          :bot -> "max-w-2xl bg-white text-gray-900 px-4 py-3 rounded-2xl rounded-bl-md shadow-sm border border-gray-200 chat-markdown"
+          :user ->
+            "max-w-xs lg:max-w-md bg-blue-600 text-white px-4 py-3 rounded-2xl rounded-br-md shadow-sm"
+
+          :bot ->
+            "max-w-2xl bg-white text-gray-900 px-4 py-3 rounded-2xl rounded-bl-md shadow-sm border border-gray-200 chat-markdown"
         end
       }>
         <%= if @message.role == :bot do %>

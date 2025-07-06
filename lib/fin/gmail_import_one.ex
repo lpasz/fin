@@ -31,7 +31,9 @@ defmodule Fin.GmailImportOne do
 
       Repo.insert(
         changeset,
-        on_conflict: [set: [embedding: email_params.embedding, updated_at: NaiveDateTime.utc_now()]],
+        on_conflict: [
+          set: [embedding: email_params.embedding, updated_at: NaiveDateTime.utc_now()]
+        ],
         conflict_target: :message_id,
         returning: true
       )

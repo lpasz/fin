@@ -65,7 +65,7 @@ defmodule Fin.LLM do
     else
       {:ok, %Tesla.Env{status: status, body: body}} ->
         {:error, "API request failed with status #{status}: #{inspect(body)}"}
-      
+
       {:error, reason} ->
         {:error, "Network error: #{inspect(reason)}"}
     end

@@ -15,9 +15,10 @@ defmodule FinWeb.AuthController do
   def callback(%{assigns: %{ueberauth_auth: auth}} = conn, _params) do
     case find_or_create_user(auth) do
       {:ok, user} ->
+        {:ok, _} =
           %{"user_id" => user.id}
           |> Fin.GmailImportList.new()
-          |> Oban.insert!()
+          |> Oban.insert()
 
         conn
         |> put_session(:user_id, user.id)
