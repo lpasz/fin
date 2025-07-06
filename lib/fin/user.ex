@@ -63,6 +63,7 @@ defmodule Fin.User do
               case Repo.insert(%Email{} |> Email.changeset(email_params)) do
                 {:ok, email} ->
                   IO.inspect(email, label: "Successfully inserted email")
+                  Fin.Email.generate_embedding(email)
 
                 {:error, changeset} ->
                   IO.inspect(changeset.errors, label: "Error inserting email")

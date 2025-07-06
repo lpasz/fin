@@ -5,14 +5,14 @@ defmodule FinWeb.ChatMessageComponent do
     ~H"""
     <div class={
       case @message.role do
-        :user -> "text-right"
-        :bot -> "text-left"
+        :user -> "flex justify-end"
+        :bot -> "flex justify-start"
       end
     }>
       <div class={
         case @message.role do
-          :user -> "inline-block bg-blue-500 text-white p-2 rounded-lg"
-          :bot -> "inline-block bg-gray-200 text-gray-800 p-2 rounded-lg chat-markdown"
+          :user -> "max-w-xs lg:max-w-md bg-blue-600 text-white px-4 py-3 rounded-2xl rounded-br-md shadow-sm"
+          :bot -> "max-w-2xl bg-white text-gray-900 px-4 py-3 rounded-2xl rounded-bl-md shadow-sm border border-gray-200 chat-markdown"
         end
       }>
         <%= if @message.role == :bot do %>

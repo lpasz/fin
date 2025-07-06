@@ -4,11 +4,17 @@ defmodule FinWeb.ChatLive do
   alias FinWeb.ChatMessageComponent
 
   def mount(_params, %{"user_id" => user_id} = _session, socket) do
+    # Schedule the first email count update
+    if connected?(socket) do
+      Process.send_after(self(), :update_email_count, 1000)
+    end
+
     {:ok,
      assign(socket,
        messages: [],
        user_input: "",
-       user_id: user_id
+       user_id: user_id,
+       email_count: get_email_count(user_id)
      )}
   end
 
@@ -18,10 +24,12 @@ defmodule FinWeb.ChatLive do
 
   def handle_event("send_message", %{"message" => message}, socket) do
     user_id = socket.assigns.user_id
-    similar_emails = Fin.Email.find_similar_emails(user_id, message)
+    
+    # Use semantic search to find relevant emails
+    relevant_emails = Fin.Email.find_similar_emails(user_id, message, 15)
 
     user_message = %{role: :user, content: message}
-    bot_response = %{role: :bot, content: generate_response(message, similar_emails)}
+    bot_response = %{role: :bot, content: generate_response(message, relevant_emails)}
 
     messages = socket.assigns.messages ++ [user_message, bot_response]
 
@@ -30,6 +38,19 @@ defmodule FinWeb.ChatLive do
        messages: messages,
        user_input: ""
      )}
+  end
+
+  def handle_info(:update_email_count, socket) do
+    # Update email count and schedule next update
+    Process.send_after(self(), :update_email_count, 1000)
+
+    {:noreply,
+     assign(socket, email_count: get_email_count(socket.assigns.user_id))}
+  end
+
+  defp get_email_count(user_id) do
+    # Count emails with embeddings (ready for semantic search)
+    Fin.Email.count_emails_with_embeddings(user_id)
   end
 
   defp generate_response(user_question, emails) do
