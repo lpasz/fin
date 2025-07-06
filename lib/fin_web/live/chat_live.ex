@@ -26,7 +26,7 @@ defmodule FinWeb.ChatLive do
     user_id = socket.assigns.user_id
     
     # Use semantic search to find relevant emails
-    relevant_emails = Fin.Email.find_similar_emails(user_id, message, 15)
+    relevant_emails = Fin.Email.find_similar_emails(user_id, message)
 
     user_message = %{role: :user, content: message}
     bot_response = %{role: :bot, content: generate_response(message, relevant_emails)}

@@ -76,31 +76,29 @@ defmodule Fin.Email do
   @doc """
   Find similar emails using vector similarity search
   """
-  def find_similar_emails(user_id, query_text, limit \\ 10) do
+  def find_similar_emails(user_id, query_text) do
     case Fin.LLM.generate_embedding(query_text) do
       {:ok, query_embedding} ->
         # Use pgvector's cosine distance for similarity search
         from(e in __MODULE__,
           where: e.user_id == ^user_id and not is_nil(e.embedding),
           order_by: fragment("? <-> ?", e.embedding, ^Pgvector.new(query_embedding)),
-          limit: ^limit
         )
         |> Repo.all()
       
       {:error, _reason} ->
         # Fallback to recent emails if embedding generation fails
-        get_recent_emails(user_id, limit)
+        get_recent_emails(user_id)
     end
   end
 
   @doc """
   Get recent emails as fallback when vector search fails
   """
-  def get_recent_emails(user_id, limit \\ 10) do
+  def get_recent_emails(user_id) do
     from(e in __MODULE__,
       where: e.user_id == ^user_id,
       order_by: [desc: e.sent_at],
-      limit: ^limit
     )
     |> Repo.all()
   end
